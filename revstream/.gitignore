@@ -1,0 +1,22 @@
+# Dependencies
+lib/
+node_modules/
+
+# Foundry
+cache/
+out/
+
+# Environment
+.env
+.env.*
+
+# Coverage
+coverage/
+lcov.info
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
