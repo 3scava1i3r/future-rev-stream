@@ -106,14 +106,15 @@ forge test -vvv
 
 ### Fork Demo (Mainnet)
 
-The demo script runs the full lifecycle on an Anvil fork using **real USDC**:
+The demo runs the full lifecycle on a mainnet fork using **real USDC**:
 
 ```bash
 # Terminal 1: Start Anvil forked from Ethereum mainnet
-anvil --fork-url https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY --fork-block-number 21000000
+anvil --fork-url https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
 
 # Terminal 2: Run the demo
-forge script script/Demo.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
+cd revstream
+bash script/demo.sh
 ```
 
 **Demo flow:**
@@ -137,9 +138,11 @@ revstream/
 │   ├── AuctionFactory.sol   # Auction creation, bidding, finalization
 │   └── RevToken.sol         # Revenue share token + distribution
 ├── test/
-│   └── RevStream.t.sol      # 12 unit tests covering full lifecycle
+│   ├── RevStream.t.sol      # 12 unit tests covering full lifecycle
+│   └── Demo.t.sol           # Fork-based demo (alternative: forge test --fork-url)
 ├── script/
-│   └── Demo.s.sol           # Fork-based end-to-end demo
+│   ├── demo.sh              # End-to-end fork demo (recommended)
+│   └── Demo.s.sol           # Foundry script (reference)
 └── foundry.toml             # Foundry configuration
 ```
 
@@ -178,7 +181,6 @@ revstream/
 
 ## 🙏 Acknowledgments
 
-- **Cherry 🍒** (ETH Cinco de Mayo) — Inspiration for the revenue auction model
 - **ENS** — Identity layer for seller verification
 - **AlphaTON Capital** — TON ecosystem alignment and future deployment target
 - **BSA-EPFL** — Hackathon organization
