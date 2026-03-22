@@ -12,6 +12,13 @@ Protocols and merchants with **recurring stablecoin revenue** (fees, subscriptio
 
 Investors buy tokenized claims via on-chain auctions and receive **RevTokens** (ERC-20), which entitle them to a **pro-rata share of future stablecoin inflows**.
 
+### ✨ Key Innovations
+
+- **ENS-First Identity**: Every auction is tied to an ENS name — human-readable, verifiable, and indexable on-chain
+- **Non-Dilutive Funding**: Sellers get upfront capital; investors get revenue exposure — no equity sacrificed
+- **Epoch-Based Claims**: Revenue deposited by customers → automatically distributed pro-rata to RevToken holders
+- **Dual Product Strategy**: Revenue auctions + LP position auctions = flexible liquidity for DeFi protocols
+
 ```
 ┌─────────────┐     auction      ┌──────────────┐     revenue     ┌──────────────┐
 │  Seller      │ ──────────────▸ │ AuctionFactory│ ◂──────────── │  Customers    │
@@ -34,12 +41,21 @@ Investors buy tokenized claims via on-chain auctions and receive **RevTokens** (
 
 ## 🏗️ Architecture
 
+### Two Products, One Platform
+
+| Product | Use Case | Seller Gets | Buyer Gets |
+|---|---|---|---|
+| **Revenue Auction** | Sell future revenue streams (subscriptions, fees) | Upfront stablecoin capital | RevTokens → pro-rata future revenue |
+| **LP Auction** | Sell DeFi LP positions without unwinding | Immediate stablecoin liquidity | LP NFT → future fee accrual |
+
 ### Contracts
 
 | Contract | Description |
 |---|---|
 | **`AuctionFactory.sol`** | Creates revenue auctions tied to ENS names. Manages bidding (highest-bid-wins) and finalizes auctions by minting RevTokens. |
 | **`RevToken.sol`** | ERC-20 representing future revenue shares. Handles epoch-based revenue deposits and pro-rata claims. |
+| **`AuctionFactoryLP.sol`** | Auction LP Position NFTs (e.g., Uniswap V3) for immediate stablecoin liquidity — sell LP tokens without unwinding. |
+| **`MockUSDC.sol`** | Mock stablecoin for testing and XRPL EVM demo. |
 
 ### ENS Integration 🔗
 
@@ -105,6 +121,10 @@ forge build
 forge test -vvv
 ```
 
+> **Tip**: Run specific test suites:
+> - `forge test --match-contract RevStream -vvv` — Revenue auction tests
+> - `forge test --match-contract AuctionFactoryLP -vvv` — LP auction tests
+
 ### 🎯 Two Demos — Two Networks
 
 | Demo | Network | Command |
@@ -147,7 +167,7 @@ Same contracts deployed to **XRPL EVM** — gas paid in **XRP**:
 
 ```bash
 # Terminal 1: Start Anvil forked from XRPL EVM testnet
-anvil --fork-url hhttps://rpc.xrplevm.org --port 8546
+anvil --fork-url https://rpc.xrplevm.org --port 8546
 
 # Terminal 2: Run the demo
 cd revstream
@@ -163,22 +183,27 @@ bash script/demo-xrpl.sh
 ```
 revstream/
 ├── src/
-│   ├── AuctionFactory.sol   # Auction creation, bidding, finalization
+│   ├── AuctionFactory.sol    # Revenue auction creation, bidding, finalization
+│   ├── AuctionFactoryLP.sol # LP position NFT auctions (Uniswap V3 → USDC)
 │   ├── RevToken.sol         # Revenue share token + distribution
-│   └── MockUSDC.sol         # Mock stablecoin for XRPL EVM demo
+│   └── MockUSDC.sol          # Mock stablecoin for XRPL EVM demo
 ├── test/
-│   ├── RevStream.t.sol      # 12 unit tests covering full lifecycle
-│   └── Demo.t.sol           # Fork-based demo (alternative: forge test --fork-url)
+│   ├── RevStream.t.sol       # 12 unit tests for revenue auction lifecycle
+│   ├── AuctionFactoryLP.t.sol # LP auction tests (create, bid, finalize, cancel)
+│   ├── Demo.t.sol            # Fork-based demo tests
+│   └── DemoLP.t.sol          # LP demo tests
 ├── script/
-│   ├── demo.sh              # EVM mainnet fork demo (AlphaTON / ENS)
-│   ├── demo-xrpl.sh        # XRPL EVM sidechain demo (XRPL Commons)
-│   └── Demo.s.sol           # Foundry script (reference)
-└── foundry.toml             # Foundry configuration
+│   ├── demo.sh               # EVM mainnet fork demo (AlphaTON / ENS)
+│   ├── demo-xrpl.sh         # XRPL EVM sidechain demo (XRPL Commons)
+│   └── Demo.s.sol            # Foundry script (reference)
+└── foundry.toml              # Foundry configuration
 ```
 
 ---
 
 ## 🧪 Test Coverage
+
+### Revenue Auction Tests (`RevStream.t.sol`)
 
 | Test | What it covers |
 |---|---|
@@ -194,6 +219,17 @@ revstream/
 | `test_depositAndClaim` | Revenue deposit + claim lifecycle |
 | `test_doubleClaim_reverts` | Double-claim prevention |
 | `test_multipleHolders_proRata` | Pro-rata distribution across holders |
+
+### LP Auction Tests (`AuctionFactoryLP.t.sol`)
+
+| Test | What it covers |
+|---|---|
+| `test_createLPAuction` | LP NFT auction creation with escrow |
+| `test_bid` | Stablecoin bidding on LP positions |
+| `test_bid_outbid_refunds` | Automatic refund on outbid |
+| `test_finalize` | NFT transfer to winner, payment to seller |
+| `test_cancel_noBids` | Cancel auction and return NFT |
+| `test_cancel_withBids_reverts` | Cannot cancel after bids received |
 
 ---
 
