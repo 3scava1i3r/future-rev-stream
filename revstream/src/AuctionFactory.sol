@@ -8,7 +8,6 @@ import {RevToken} from "./RevToken.sol";
 /// @title AuctionFactory – Create & settle future-revenue auctions tied to ENS names
 /// @notice Protocols/merchants identified by ENS name auction off claims to future stablecoin revenue.
 ///         Investors bid, the highest bidder wins, and RevTokens are minted as proof of their claim.
-/// @dev    Simple highest-bid-wins model for hackathon MVP. Inspired by Cherry 🍒.
 contract AuctionFactory {
     using SafeERC20 for IERC20;
 

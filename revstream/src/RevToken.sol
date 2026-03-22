@@ -8,7 +8,6 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 /// @title RevToken – Future Revenue Share Token
 /// @notice ERC-20 token representing a pro-rata claim on future stablecoin revenue.
 ///         Holders can claim their share of deposited revenue proportional to their balance.
-/// @dev    Inspired by Cherry 🍒 (ETH Cinco de Mayo) — simplified for hackathon demo.
 contract RevToken is ERC20 {
     using SafeERC20 for IERC20;
 
