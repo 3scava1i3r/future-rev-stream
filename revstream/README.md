@@ -104,25 +104,44 @@ forge build
 forge test -vvv
 ```
 
-### Fork Demo (Mainnet)
+### 🎯 Two Demos — Two Sponsor Alignments
 
-The demo runs the full lifecycle on a mainnet fork using **real USDC**:
+| Sponsor | Demo | Network |
+|---|---|---|
+| **XRPL Commons** | `demo-xrpl.sh` | XRPL EVM Sidechain ✅ |
+| **AlphaTON Capital** | `demo.sh` | EVM Mainnet fork ✅ |
+| **ENS** | Both demos | ENS names on both chains ✅ |
+
+### Demo 1: EVM Mainnet Fork (AlphaTON / ENS)
+
+Full lifecycle on a mainnet fork using **real USDC**:
 
 ```bash
-# Terminal 1: Start Anvil forked from Ethereum mainnet
-anvil --fork-url https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
+# Terminal 1
+anvil --fork-url https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY --port 8545
 
-# Terminal 2: Run the demo
-cd revstream
+# Terminal 2
 bash script/demo.sh
 ```
 
-**Demo flow:**
-1. Seeds demo accounts with USDC from a mainnet whale
-2. Deploys `AuctionFactory`
-3. Creates auction for `myshop.eth` — "Q2 2026 stablecoin revenue"
+### Demo 2: XRPL EVM Sidechain (XRPL Commons)
+
+**Same contracts** deployed to XRPL EVM — gas paid in **XRP**:
+
+```bash
+# Terminal 1
+anvil --fork-url https://rpc.testnet.xrplevm.org --port 8546
+
+# Terminal 2
+bash script/demo-xrpl.sh
+```
+
+### Demo flow (both demos):
+1. Deploy stablecoin (mock on XRPL, real USDC on mainnet)
+2. Deploy `AuctionFactory`
+3. Create auction for `myshop.eth` — "Q2 2026 revenue"
 4. Investor bids 50,000 USDC and wins
-5. Auction finalized → seller receives USDC, investor gets 1M RevTokens
+5. Auction finalized → seller gets USDC, investor gets 1M RevTokens
 6. Customer deposits 10,000 USDC as simulated revenue
 7. Investor claims 10,000 USDC (100% pro-rata share)
 
@@ -136,12 +155,14 @@ All steps produce clear console logs so judges can follow along.
 revstream/
 ├── src/
 │   ├── AuctionFactory.sol   # Auction creation, bidding, finalization
-│   └── RevToken.sol         # Revenue share token + distribution
+│   ├── RevToken.sol         # Revenue share token + distribution
+│   └── MockUSDC.sol         # Test stablecoin for XRPL EVM demo
 ├── test/
 │   ├── RevStream.t.sol      # 12 unit tests covering full lifecycle
-│   └── Demo.t.sol           # Fork-based demo (alternative: forge test --fork-url)
+│   └── Demo.t.sol           # Fork-based demo (alternative)
 ├── script/
-│   ├── demo.sh              # End-to-end fork demo (recommended)
+│   ├── demo.sh              # EVM mainnet fork demo
+│   ├── demo-xrpl.sh         # XRPL EVM sidechain demo
 │   └── Demo.s.sol           # Foundry script (reference)
 └── foundry.toml             # Foundry configuration
 ```
